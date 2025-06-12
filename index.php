@@ -17,6 +17,8 @@ require_once 'config/database.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Arabic Fonts CSS -->
+    <link rel="stylesheet" href="assets/css/arabic-fonts.css">
 </head>
 <body>
     <!-- Navigation -->
