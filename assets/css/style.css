@@ -1,0 +1,149 @@
+/* Main Styles for Bato Medical Report System */
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.btn-success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.test-row {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #dee2e6;
+}
+
+/* PDF Report Styles */
+.report-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.report-logo {
+    max-width: 200px;
+    margin-bottom: 10px;
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.report-table th, .report-table td {
+    border: 1px solid #dee2e6;
+    padding: 8px;
+}
+
+.report-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.report-footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.doctor-signature {
+    margin-top: 50px;
+    text-align: right;
+}
+
+.doctor-signature img {
+    max-width: 150px;
+    margin-bottom: 10px;
+}
+
+.doctor-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.doctor-position {
+    font-style: italic;
+}
+
+/* Patient Search Highlight Styles */
+.highlighted-option {
+    background-color: #ffffa0 !important;
+    font-weight: bold;
+}
+
+/* Make dropdown options more readable */
+select option {
+    padding: 8px;
+}
+
+/* Print styles */
+@media print {
+    body {
+        background-color: #fff;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+    
+    .container {
+        width: 100%;
+        max-width: 100%;
+    }
+}
