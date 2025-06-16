@@ -22,7 +22,7 @@ require_once 'config/database.php';
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="index.php">Bato Medical Report System</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -35,6 +35,12 @@ require_once 'config/database.php';
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="reports.php">Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="prescriptions.php"><i class="fas fa-prescription"></i> Prescriptions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nurse_treatments.php"><i class="fas fa-user-nurse"></i> Nurse Treatments</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="manage_doctors.php">Doctors</a>
@@ -55,14 +61,14 @@ require_once 'config/database.php';
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header">
                         <h4 class="mb-0">Medical Report Generator</h4>
                     </div>
                     <div class="card-body">
                         <form id="reportForm" action="generate_report.php" method="post">
                             <!-- Patient Information Section -->
                             <div class="card mb-4">
-                                <div class="card-header bg-light">
+                                <div class="card-header">
                                     <h5 class="mb-0">Patient Information</h5>
                                 </div>
                                 <div class="card-body">
@@ -70,21 +76,17 @@ require_once 'config/database.php';
                                         <div class="col-md-6">
                                             <label for="patient_search" class="form-label">Search Patient</label>
                                             <div class="input-group mb-2">
-                                                <input type="text" class="form-control" id="patient_search" placeholder="Search by name, mobile or civil ID">
+                                                <input type="text" class="form-control" id="patient_search" placeholder="Search by name, mobile or civil ID" autocomplete="off">
                                                 <button class="btn btn-outline-secondary" type="button" id="clear_search">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
+                                            <div id="search_status" class="small text-muted mb-2">Type at least 3 characters to search</div>
                                             <label for="patient" class="form-label">Select Patient</label>
                                             <div class="input-group">
                                                 <select class="form-select" id="patient" name="patient_id" required>
                                                     <option value="">-- Select Patient --</option>
-                                                    <?php
-                                                    $patients = executeQuery("SELECT id, name, civil_id, file_number, mobile FROM patients ORDER BY name");
-                                                    while ($row = $patients->fetch_assoc()) {
-                                                        echo "<option value='{$row['id']}' data-civil-id='{$row['civil_id']}' data-mobile='{$row['mobile']}' data-file-number='{$row['file_number']}' data-search-text='{$row['name']} {$row['civil_id']} {$row['mobile']}'>{$row['name']}</option>";
-                                                    }
-                                                    ?>
+                                                    <!-- Patient options will be loaded via AJAX -->
                                                 </select>
                                                 <a href="add_patient.php" class="btn btn-success">
                                                     <i class="fas fa-user-plus"></i> New
@@ -111,7 +113,7 @@ require_once 'config/database.php';
 
                             <!-- Test Results Section -->
                             <div class="card mb-4">
-                                <div class="card-header bg-light">
+                                <div class="card-header">
                                     <h5 class="mb-0">Test Results</h5>
                                 </div>
                                 <div class="card-body">
@@ -128,7 +130,7 @@ require_once 'config/database.php';
 
                             <!-- Doctor Information Section -->
                             <div class="card mb-4">
-                                <div class="card-header bg-light">
+                                <div class="card-header">
                                     <h5 class="mb-0">Doctor Information</h5>
                                 </div>
                                 <div class="card-body">

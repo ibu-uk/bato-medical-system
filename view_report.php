@@ -88,8 +88,8 @@ function sanitizeFilename($string) {
             .report-container {
                 width: 90% !important; /* Reduced from 100% to 90% */
                 max-width: 90% !important;
-                margin: 0 auto !important; /* Center the content */
-                padding: 20px 40px !important; /* Increased padding to move content inward */
+                margin: 25px auto 0 !important; /* Center the content and add top margin */
+                padding: 30px 40px !important; /* Increased padding to move content inward */
             }
             /* Ensure layout is preserved when printing */
             .row {
@@ -113,14 +113,40 @@ function sanitizeFilename($string) {
             @page {
                 size: auto;   /* auto is the default anyway */
                 margin: 0mm;  /* removes default margin */
+                margin-bottom: 0 !important;
             }
             @page :header {
-                display: none;
-                visibility: hidden;
+                display: none !important;
+                visibility: hidden !important;
             }
             @page :footer {
-                display: none;
-                visibility: hidden;
+                display: none !important;
+                visibility: hidden !important;
+            }
+            /* Hide page numbers - comprehensive approach */
+            html {
+                counter-reset: page !important;
+            }
+            /* Target all possible page number elements across browsers */
+            .pagenumber, .pagecount, #pageFooter, .page-number, .page-count,
+            #footer, .footer, footer, #header, .header, header,
+            .page, #page, [class*='page-number'], [id*='page-number'],
+            [class*='pageNumber'], [id*='pageNumber'] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                height: 0 !important;
+                max-height: 0 !important;
+                min-height: 0 !important;
+                position: absolute !important;
+                top: -9999px !important;
+                left: -9999px !important;
+                z-index: -9999 !important;
+            }
+            /* Override browser defaults */
+            body::after, body::before {
+                display: none !important;
+                content: "" !important;
             }
         }
         
@@ -130,6 +156,13 @@ function sanitizeFilename($string) {
             margin-bottom: 10px;
             filter: invert(1) brightness(0);
             -webkit-filter: invert(1) brightness(0);
+        }
+        
+        /* Doctor information styling for print */
+        .doctor-name, .doctor-position, .doctor-signature {
+            color: blue !important;
+            font-weight: bold !important;
+            display: none !important; /* Hide doctor information */
         }
     </style>
 </head>
@@ -173,9 +206,9 @@ function sanitizeFilename($string) {
     </div>
 
     <!-- Report Content -->
-    <div class="container report-container">
+    <div class="container report-container" style="margin-top: 25px;">
         <!-- Header with Logo and Clinic Info -->
-        <div class="row mb-4">
+        <div class="row">
             <div class="col-6 text-start">
                 <!-- BATO Health/Beauty Logo - Using the actual image with custom CSS class -->
                 <img src="assets/images/IMG_4554.PNG" alt="BATO Health/Beauty" class="bato-logo">
@@ -190,8 +223,7 @@ function sanitizeFilename($string) {
                 </div>
             </div>
         </div>
-
-        <hr>
+        <hr style="margin-top: 0; margin-bottom: 15px;">
 
         <!-- Patient Information - More Compact -->
         <div class="row mb-2">
@@ -226,8 +258,11 @@ function sanitizeFilename($string) {
             </div>
         </div>
 
+        <!-- Added space between patient info and test results -->
+        <div style="margin-top: 35px;"></div>
+
         <!-- Test Results -->
-        <div class="test-category mb-2">
+        <div class="test-category mb-2" style="margin-top: 15px;">
             
             <!-- Test Results Table -->
             <table class="table table-bordered table-sm">
@@ -283,22 +318,25 @@ function sanitizeFilename($string) {
             </table>
         </div>
 
-        <!-- Footer with Doctor Signature - adjusted position -->
-        <div class="row" style="margin-top: 250px; page-break-inside: avoid;">
+        <!-- Footer with Doctor Signature - adjusted position (hidden as requested) -->
+        <div class="row" style="margin-top: 100px; page-break-inside: avoid !important; break-inside: avoid !important;">
             <div class="col-md-6">
-                <?php if (!empty($report['signature_image_path'])): ?>
-                <img src="<?php echo $report['signature_image_path']; ?>" alt="Doctor Signature" style="max-height: 80px;">
-                <?php endif; ?>
-                <p class="mt-2" style="margin-bottom: 0;"><?php echo $report['doctor_name']; ?></p>
-                <p style="margin-top: 0;"><?php echo $report['doctor_position']; ?></p>
+                <!-- Doctor signature and information hidden as requested -->
+                <div style="display: none;">
+                    <?php if (!empty($report['signature_image_path'])): ?>
+                    <img src="<?php echo $report['signature_image_path']; ?>" alt="Doctor Signature" class="doctor-signature" style="max-height: 80px;">
+                    <?php endif; ?>
+                    <p class="mt-2 doctor-name" style="margin-bottom: 0;"><?php echo $report['doctor_name']; ?></p>
+                    <p class="doctor-position" style="margin-top: 0;"><?php echo $report['doctor_position']; ?></p>
+                </div>
             </div>
             <div class="col-md-6">
                 <!-- Empty space where Lab Director used to be -->
             </div>
         </div>
 
-        <!-- Page Number -->
-        <div class="text-end mt-4">
+        <!-- Page Number - hidden as requested -->
+        <div class="text-end mt-4" style="display: none;">
             <p>Page 1 of 1</p>
         </div>
     </div>

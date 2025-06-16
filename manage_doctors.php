@@ -97,6 +97,14 @@ $doctors = executeQuery($query);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- Print-specific styles -->
+    <style type="text/css" media="print">
+        .doctor-name, .doctor-position, .doctor-signature {
+            color: blue !important;
+            font-weight: bold !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -191,9 +199,9 @@ $doctors = executeQuery($query);
                                         while ($row = $doctors->fetch_assoc()) {
                                             echo "<tr>";
                                             echo "<td>{$row['id']}</td>";
-                                            echo "<td>{$row['name']}</td>";
-                                            echo "<td>{$row['position']}</td>";
-                                            echo "<td>";
+                                            echo "<td class='doctor-name'>{$row['name']}</td>";
+                                            echo "<td class='doctor-position'>{$row['position']}</td>";
+                                            echo "<td class='doctor-signature'>";
                                             if (!empty($row['signature_image_path'])) {
                                                 echo "<img src='{$row['signature_image_path']}' alt='Signature' style='max-height: 50px;'>";
                                             } else {

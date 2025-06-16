@@ -2,8 +2,18 @@
 // Include database configuration
 require_once '../config/database.php';
 
-// Get all test types
-$query = "SELECT id, name, unit, normal_range FROM test_types ORDER BY name";
+// Check if search term is provided
+$search_term = '';
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $search_term = sanitize($_GET['search']);
+    $query = "SELECT id, name, unit, normal_range FROM test_types 
+             WHERE name LIKE '%$search_term%' 
+             ORDER BY name";
+} else {
+    // Get all test types if no search
+    $query = "SELECT id, name, unit, normal_range FROM test_types ORDER BY name";
+}
+
 $result = executeQuery($query);
 
 $tests = array();

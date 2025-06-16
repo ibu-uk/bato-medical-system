@@ -56,8 +56,19 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     $message = $result ? "Test type deleted successfully" : "Error deleting test type";
 }
 
-// Get all test types
-$query = "SELECT id, name, unit, normal_range FROM test_types ORDER BY name";
+// Handle search functionality
+$search_term = '';
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $search_term = sanitize($_GET['search']);
+    $query = "SELECT id, name, unit, normal_range FROM test_types 
+             WHERE name LIKE '%$search_term%' 
+             OR unit LIKE '%$search_term%' 
+             OR normal_range LIKE '%$search_term%' 
+             ORDER BY name";
+} else {
+    // Get all test types if no search
+    $query = "SELECT id, name, unit, normal_range FROM test_types ORDER BY name";
+}
 $result = executeQuery($query);
 ?>
 
@@ -170,6 +181,23 @@ $result = executeQuery($query);
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        /* Search form styles */
+        .form-inline {
+            display: flex;
+        }
+        .input-group {
+            display: flex;
+            width: 100%;
+        }
+        .input-group-append {
+            display: flex;
+        }
+        .w-100 {
+            width: 100%;
+        }
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -228,6 +256,24 @@ $result = executeQuery($query);
             </div>
             
             <h2>Existing Test Types</h2>
+            
+            <!-- Search Form -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form method="get" action="manage_test_types.php" class="form-inline">
+                        <div class="input-group w-100">
+                            <input type="text" class="form-control" name="search" placeholder="Search by name, unit or normal range..." value="<?php echo htmlspecialchars($search_term ?? ''); ?>">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                                <?php if (isset($_GET['search']) && !empty($_GET['search'])): ?>
+                                    <a href="manage_test_types.php" class="btn btn-secondary">Clear</a>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>

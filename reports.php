@@ -92,9 +92,6 @@ $reports = executeQuery($query);
                                                 <a href='view_report.php?id={$row['id']}' class='btn btn-sm btn-info me-1' title='View'>
                                                     <i class='fas fa-eye'></i>
                                                 </a>
-                                                <a href='download_pdf.php?id={$row['id']}' class='btn btn-sm btn-success me-1' title='Download PDF'>
-                                                    <i class='fas fa-file-pdf'></i>
-                                                </a>
                                                 <button class='btn btn-sm btn-danger' onclick='deleteReport({$row['id']})' title='Delete'>
                                                     <i class='fas fa-trash'></i>
                                                 </button>

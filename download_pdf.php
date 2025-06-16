@@ -63,28 +63,32 @@ class MYPDF extends TCPDF {
         // Get clinic info from global variable
         global $clinic;
         
-        // Use text-based logo to avoid PNG alpha channel issues
-        // Since your server is missing Imagick or GD extension for PNG alpha channel support
-        $this->SetFont('dejavusans', 'B', 48); // Bold font for BATO
+        // Set header position further down from the top edge
+        $this->SetY(15); // Start 15mm from top instead of default
+        
+        // Use text-based logo since server doesn't have Imagick or GD extension
+        // Match the style from view_report.php
+        $this->SetFont('dejavusans', 'B', 36); // Bold font for BATO
         $this->SetTextColor(0, 0, 0); // Black color
-        $this->SetXY(25, 10); // Adjusted X position to match new margins
+        $this->SetXY(15, $this->GetY());
         $this->Cell(75, 15, 'BATO', 0, 1, 'L');
         
         // Add "Health/Beauty" text below
-        $this->SetFont('dejavusans', '', 16);
-        $this->SetXY(25, 25); // Adjusted X position to match new margins
+        $this->SetFont('dejavusans', '', 12);
+        $this->SetXY(15, $this->GetY() - 5);
         $this->Cell(75, 5, 'Health/Beauty', 0, 1, 'L');
-        $this->SetFont('dejavusans', '', 10);
-        $this->SetTextColor(0, 0, 0); // Reset text color
         
-        // Set clinic info - using normal font for BATO CLINIC as requested
-        $this->SetFont('dejavusans', '', 12); // Changed from bold to normal font
-        $this->SetXY(120, 10);
-        $this->Cell(75, 5, 'BATO CLINIC', 0, 1, 'R'); // Hardcoded as requested
+        // Reset text color
+        $this->SetTextColor(0, 0, 0);
+        
+        // Set clinic info
+        $this->SetFont('dejavusans', '', 12);
+        $this->SetXY(120, $this->GetY() - 20);
+        $this->Cell(75, 5, 'BATO CLINIC', 0, 1, 'R');
         
         $this->SetFont('dejavusans', '', 8);
-        $this->SetXY(120, 15);
-        $this->MultiCell(75, 4, $clinic['address'], 0, 'R');
+        $this->SetXY(120, $this->GetY());
+        $this->Cell(75, 4, $clinic['address'], 0, 1, 'R');
         
         $this->SetXY(120, $this->GetY());
         $this->Cell(75, 4, 'Phone: ' . $clinic['phone'], 0, 1, 'R');
@@ -95,8 +99,8 @@ class MYPDF extends TCPDF {
         $this->SetXY(120, $this->GetY());
         $this->Cell(75, 4, 'Website: ' . $clinic['website'], 0, 1, 'R');
         
-        // Line
-        $this->Line(15, 35, 195, 35);
+        // Line - positioned lower to match the view_report.php layout
+        $this->Line(15, $this->GetY() + 5, 195, $this->GetY() + 5);
     }
 
     // Page footer
@@ -117,8 +121,8 @@ $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8',
 $pdf->setFontSubsetting(true);
 
 // Add Arabic font
-$pdf->AddFont('dejavusans', '', 'dejavusans.php');
-$pdf->AddFont('dejavusans', 'B', 'dejavusansb.php');
+$pdf->setRTL(false); // Left-to-right by default
+$pdf->SetFont('dejavusans', '', 10);
 
 // Set document information
 $pdf->SetCreator('Bato Medical Report System');
@@ -137,13 +141,13 @@ $pdf->setFooterFont(Array('dejavusans', '', 8));
 // Set default monospaced font
 $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
-// Set custom margins to ensure content is not cut off
-$pdf->SetMargins(25, 40, 25); // Left, Top, Right margins increased
-$pdf->SetHeaderMargin(10);
+// Set margins - increased top margin to move content down
+$pdf->SetMargins(15, 50, 15);
+$pdf->SetHeaderMargin(15); // Increased from 10 to 15
 $pdf->SetFooterMargin(10);
 
 // Set auto page breaks
-$pdf->SetAutoPageBreak(TRUE, 25); // Increased bottom margin
+$pdf->SetAutoPageBreak(TRUE, 15);
 
 // Set image scale factor
 $pdf->setImageScale(1.5); // Increased scale factor for better image quality
@@ -155,7 +159,8 @@ $pdf->AddPage();
 $pdf->SetFont('dejavusans', '', 10);
 
 // Patient Information - Layout matching the image with left and right columns
-$pdf->SetY(40);
+// Increased Y position to add more space from the header
+$pdf->SetY(50);
 
 // Left column - Patient information
 $leftX = 15;
@@ -208,7 +213,7 @@ $pdf->SetFont('dejavusans', '', 9);
 $pdf->Cell(5, 5, ':', 0, 0);
 $pdf->Cell(45, 5, $printedDate, 0, 1);
 
-$pdf->Ln(3);
+$pdf->Ln(10); // Increased space between patient info and test results table
 
 // Test Results Header
 $pdf->SetFont('dejavusans', 'B', 10);
@@ -241,23 +246,15 @@ if ($testsResult && $testsResult->num_rows > 0) {
         $pdf->Cell(30, 5, $test['unit'], 1, 0, 'C');
         $pdf->Cell(40, 5, $test['normal_range'], 1, 1, 'C');
         
-        // Display remarks if present - more compact format
+        // Display remarks if present - match the style from view_report.php
         if (!empty($test['remarks'])) {
-            // Combine remarks into a single line with bullet points
-            $pdf->SetFont('dejavusans', 'I', 7); // Smaller italic font
+            // Add remarks as a new row under the test
+            $pdf->SetFont('dejavusans', '', 8);
             
-            $remarks = explode("\n", $test['remarks']);
-            $remarkText = 'Remarks: ';
-            $formattedRemarks = [];
+            // Show remarks on its own line
+            $pdf->Cell(80, 5, 'Remarks: ' . $test['remarks'], 1, 0, 'L');
+            $pdf->Cell(100, 5, '', 1, 1); // Empty cells to complete the row
             
-            foreach ($remarks as $remark) {
-                if (trim($remark) !== '') {
-                    $formattedRemarks[] = '• ' . trim($remark);
-                }
-            }
-            
-            $remarkText .= implode(' | ', $formattedRemarks);
-            $pdf->Cell(180, 4, $remarkText, 1, 1, 'L');
             $pdf->SetFont('dejavusans', '', 8); // Reset font
         }
     }
@@ -277,22 +274,27 @@ $pdf->setPageMark();
 // Doctor Signature - on left side
 $pdf->SetXY(15, $pdf->GetY());
 
-// Use text-based signature to avoid any image-related errors
-// This completely avoids the need for Imagick or GD extensions
+// Use text-based signature since server doesn't have Imagick or GD extension
+// Match the style from view_report.php
 $pdf->SetFont('dejavusans', 'I', 10);
-$pdf->Cell(60, 10, '[Doctor Signature]', 0, 1, 'L');
 
 // Draw a signature line
-$lineY = $pdf->GetY() - 5;
-$pdf->Line(25, $lineY, 85, $lineY);
+$pdf->Line(15, $pdf->GetY(), 85, $pdf->GetY());
+$pdf->Ln(2);
 
-// Add doctor's name and position below
-$pdf->SetXY(15, $pdf->GetY());
-$pdf->SetFont('dejavusans', 'B', 9);
-$pdf->Cell(75, 6, $report['doctor_name'], 0, 1, 'L');
+// Add doctor's name without the "(signed)" text to match view_report.php
+$pdf->SetFont('dejavusans', '', 10);
+$pdf->Cell(60, 5, $report['doctor_name'], 0, 1, 'L');
+
+// Add position below
 $pdf->SetXY(15, $pdf->GetY());
 $pdf->SetFont('dejavusans', '', 9);
 $pdf->Cell(75, 6, $report['doctor_position'], 0, 1, 'L');
+
+// Add page number at the bottom right
+$pdf->SetY(-20);
+$pdf->SetFont('dejavusans', '', 9);
+$pdf->Cell(0, 10, 'Page 1 of 1', 0, 0, 'R');
 
 // Sanitize patient name for filename
 function sanitizeFilename($string) {
