@@ -268,6 +268,10 @@ function sanitizeFilename($string) {
                         <th width="120" style="padding: 2px;">Patient Name</th>
                         <td style="padding: 2px;">: <?php echo $prescription['patient_name']; ?></td>
                     </tr>
+                    <tr style="font-size: 0.9rem; line-height: 1.2;">
+                        <th style="padding: 2px;">Civil ID</th>
+                        <td style="padding: 2px;">: <?php echo $prescription['civil_id']; ?></td>
+                    </tr>
                 </table>
             </div>
             <div class="col-md-6">

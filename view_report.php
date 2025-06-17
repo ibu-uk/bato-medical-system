@@ -259,10 +259,13 @@ function sanitizeFilename($string) {
         </div>
 
         <!-- Added space between patient info and test results -->
-        <div style="margin-top: 35px;"></div>
+        <div style="margin-top: 20px;"></div>
+
+        <!-- Medical Report Title -->
+        <h3 class="text-center mb-4">MEDICAL REPORT</h3>
 
         <!-- Test Results -->
-        <div class="test-category mb-2" style="margin-top: 15px;">
+        <div class="test-category mb-2">
             
             <!-- Test Results Table -->
             <table class="table table-bordered table-sm">
