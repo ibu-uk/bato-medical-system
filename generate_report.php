@@ -8,6 +8,12 @@ require_once 'config/timezone.php';
 // Include database configuration
 require_once 'config/database.php';
 
+// Include authentication helpers
+require_once 'config/auth.php';
+
+// Require login to access this page
+requireLogin();
+
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get form data
@@ -15,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $doctorId = sanitize($_POST['doctor_id']);
     $reportDate = sanitize($_POST['report_date']);
     $generatedBy = sanitize($_POST['generated_by']);
+    $userId = isset($_POST['user_id']) ? sanitize($_POST['user_id']) : $_SESSION['user_id'];
     
     // Get test data
     $testTypeIds = isset($_POST['test_type_id']) ? $_POST['test_type_id'] : [];
@@ -23,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $testRemarks = isset($_POST['test_remarks']) ? $_POST['test_remarks'] : [];
     
     // Insert report into database
-    $reportQuery = "INSERT INTO reports (patient_id, doctor_id, report_date, generated_by, created_at) 
-                   VALUES ('$patientId', '$doctorId', '$reportDate', '$generatedBy', NOW())";
+    $reportQuery = "INSERT INTO reports (patient_id, doctor_id, report_date, generated_by, user_id, created_at) 
+                   VALUES ('$patientId', '$doctorId', '$reportDate', '$generatedBy', '$userId', NOW())";
     $reportId = executeInsert($reportQuery);
     
     // Insert test results

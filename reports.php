@@ -2,14 +2,25 @@
 // Start session
 session_start();
 
+// Include timezone configuration
+require_once 'config/timezone.php';
+
 // Include database configuration
 require_once 'config/database.php';
 
+// Include authentication helpers
+require_once 'config/auth.php';
+
+// Require login to access this page
+requireLogin();
+
 // Get all reports
-$query = "SELECT r.id, r.report_date, r.created_at, p.name as patient_name, p.civil_id, d.name as doctor_name
+$query = "SELECT r.id, r.report_date, r.created_at, p.name as patient_name, p.civil_id, d.name as doctor_name, 
+          u.full_name as generated_by
           FROM reports r
           JOIN patients p ON r.patient_id = p.id
           JOIN doctors d ON r.doctor_id = d.id
+          LEFT JOIN users u ON r.user_id = u.id
           ORDER BY r.created_at DESC";
 $reports = executeQuery($query);
 ?>
@@ -30,14 +41,14 @@ $reports = executeQuery($query);
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Bato Medical Report System</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
@@ -45,7 +56,39 @@ $reports = executeQuery($query);
                         <a class="nav-link active" href="reports.php">Reports</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="prescriptions.php">Prescriptions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="nurse_treatments.php">Nurse Treatments</a>
+                    </li>
+                    <?php if (hasRole(['admin'])): ?>
+                    <li class="nav-item">
                         <a class="nav-link" href="manage_doctors.php">Doctors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="manage_test_types.php">Test Types</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="manage_users.php">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="activity_logs.php">Activity Logs</a>
+                    </li>
+                    <?php endif; ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="add_patient.php">Add Patient</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($_SESSION['full_name']); ?>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-id-card"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -73,6 +116,7 @@ $reports = executeQuery($query);
                                         <th>Civil ID</th>
                                         <th>Report Date</th>
                                         <th>Doctor</th>
+                                        <th>Created By</th>
                                         <th>Created At</th>
                                         <th>Actions</th>
                                     </tr>
@@ -87,15 +131,21 @@ $reports = executeQuery($query);
                                             echo "<td>{$row['civil_id']}</td>";
                                             echo "<td>" . date('Y-m-d', strtotime($row['report_date'])) . "</td>";
                                             echo "<td>{$row['doctor_name']}</td>";
+                                            echo "<td>{$row['generated_by']}</td>";
                                             echo "<td>" . date('Y-m-d H:i', strtotime($row['created_at'])) . "</td>";
-                                            echo "<td>
-                                                <a href='view_report.php?id={$row['id']}' class='btn btn-sm btn-info me-1' title='View'>
-                                                    <i class='fas fa-eye'></i>
-                                                </a>
-                                                <button class='btn btn-sm btn-danger' onclick='deleteReport({$row['id']})' title='Delete'>
-                                                    <i class='fas fa-trash'></i>
-                                                </button>
-                                            </td>";
+                                            echo '<td>
+                                                <a href="view_report.php?id=' . $row['id'] . '" class="btn btn-sm btn-info me-1" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>';
+                                                
+                                                // Only show delete button for admin users
+                                                if (hasRole(['admin'])) {
+                                                    echo '<button class="btn btn-sm btn-danger" onclick="deleteReport(' . $row['id'] . ')" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>';
+                                                }
+                                                
+                                            echo '</td>';
                                             echo "</tr>";
                                         }
                                     }
@@ -154,6 +204,13 @@ $reports = executeQuery($query);
             $('#confirmDelete').attr('href', 'delete_report.php?id=' + id);
             var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             deleteModal.show();
+        }
+        
+        function logActivity(type, id) {
+            fetch('log_activity.php?type=' + type + '&id=' + id, {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
         }
     </script>
 </body>

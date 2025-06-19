@@ -8,6 +8,12 @@ require_once 'config/timezone.php';
 // Include database configuration
 require_once 'config/database.php';
 
+// Include authentication helpers
+require_once 'config/auth.php';
+
+// Require login to access this page
+requireLogin();
+
 // Check if report ID is provided
 if (!isset($_GET['id'])) {
     header("Location: index.php");
@@ -31,6 +37,9 @@ if (!$reportResult || $reportResult->num_rows === 0) {
 }
 
 $report = $reportResult->fetch_assoc();
+
+// Log the report view activity
+logUserActivity('view_report', $reportId);
 
 // Get test results
 $testsQuery = "SELECT rt.test_value, rt.flag, rt.remarks, tt.name as test_name, tt.unit, tt.normal_range
@@ -178,15 +187,29 @@ function sanitizeFilename($string) {
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="reports.php">Reports</a>
                     </li>
+                    <?php if (hasRole(['admin'])): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="manage_doctors.php">Doctors</a>
+                    </li>
+                    <?php endif; ?>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($_SESSION['full_name']); ?>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-id-card"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -199,8 +222,14 @@ function sanitizeFilename($string) {
             <h2>Medical Report</h2>
             <div>
                 <button onclick="printReport()" class="btn btn-primary">
-                    <i class="fas fa-print"></i> Print/Save as PDF
+                    <i class="fas fa-print"></i> Print Report
                 </button>
+                <?php 
+                // Log print activity when button is clicked
+                if (isset($_GET['print']) && $_GET['print'] == '1') {
+                    logUserActivity('print_report', $reportId);
+                }
+                ?>
                 <a href="index.php" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>
@@ -363,6 +392,12 @@ function sanitizeFilename($string) {
             // This will be suggested as the filename when saving as PDF
             var originalTitle = document.title;
             document.title = suggestedFilename;
+            
+            // Log the print activity
+            fetch('log_activity.php?type=print_report&id=<?php echo $reportId; ?>', {
+                method: 'GET',
+                credentials: 'same-origin'
+            });
             
             // Print the document
             window.print();
