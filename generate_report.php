@@ -2,6 +2,9 @@
 // Start session
 session_start();
 
+// Include timezone configuration
+require_once 'config/timezone.php';
+
 // Include database configuration
 require_once 'config/database.php';
 
