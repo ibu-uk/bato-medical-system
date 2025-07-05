@@ -1,0 +1,29 @@
+Prescription ID: 
+POST data: Array
+(
+    [patient_id] => 7239
+    [prescription_date] => 2025-06-14
+    [doctor_id] => 6
+    [medicine_name] => Array
+        (
+            [0] => couf surf
+        )
+
+    [dose] => Array
+        (
+            [0] => daily dose
+        )
+
+    [consultation_report] => 
+)
+
+Found medicine_name array with 1 items
+Adding medicine: couf surf, dose: daily dose
+Failed to insert medication
+2025-06-14 10:21:19 - New prescription ID: 
+2025-06-14 10:27:26 - New prescription ID: 
+2025-06-14 10:29:03 - New prescription ID: 
+2025-06-14 10:32:26 - New prescription ID: 
+2025-06-14 10:37:11 - New prescription ID: 
+2025-06-14 10:50:38 - New prescription ID: 
+2025-06-14 10:53:04 - New prescription ID: 
