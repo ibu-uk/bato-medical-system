@@ -48,7 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $user = $result->fetch_assoc();
                 
                 // Verify password
-                if (password_verify($password, $user['password'])) {
+                
+if (password_verify($password, $user['password'])) {
                     // Check if user is active
                     if ($user['is_active']) {
                         // Set session variables
@@ -145,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-container">
         <div class="login-logo">
-            <img src="assets/images/logo.png" alt="Bato Medical Logo">
+            <!-- <img src="assets/images/logo.png" alt="Bato Medical Logo"> -->
         </div>
         <div class="card">
             <div class="card-header">
